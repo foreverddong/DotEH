@@ -10,11 +10,14 @@ namespace DotEH.Pages
     public partial class Index
     {
         private string queryStr { get; set; }
-        private IEnumerable<GalleryMetadata> metadata { get; set; }
+        private IEnumerable<GalleryMetadata> metadata { get; set; } = new List<GalleryMetadata>();
+        private bool searching = false;
 
         public async Task PerformSearch()
         {
-           this.metadata = await searchingService.DoSearch(queryStr);
+            this.searching = true;
+            this.metadata = await searchingService.DoSearch(queryStr);
+            this.searching = false;
         }
     }
 }
