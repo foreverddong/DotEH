@@ -8,5 +8,6 @@ namespace DotEH.Pages
 {
     public partial class EhOptions
     {
+
     }
 }

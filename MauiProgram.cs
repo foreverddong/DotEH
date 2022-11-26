@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using DotEH.Data;
 using MudBlazor.Services;
+using DotEH.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DotEH;
 
@@ -22,9 +23,19 @@ public static class MauiProgram
 		builder.Services.AddBlazorWebViewDeveloperTools();
 		builder.Logging.AddDebug();
 #endif
-
-		builder.Services.AddSingleton<WeatherForecastService>();
 		builder.Services.AddMudServices();
-		return builder.Build();
+		builder.Services.AddSingleton<OptionsStorageService>((options) => 
+		{ 
+			var res = new OptionsStorageService();
+			res.UpdateFromStorage();
+			return res;
+		});
+		builder.Services.AddScoped<EhSearchingService>();
+        builder.Services.AddHttpClient<EhSearchingService>((services, client) =>
+        {
+			var settings = services.GetService<OptionsStorageService>();
+            client.BaseAddress = settings.EhBaseAddress;
+        });
+        return builder.Build();
 	}
 }

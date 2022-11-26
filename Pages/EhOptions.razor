@@ -1,1 +1,24 @@
-﻿
+﻿@page "/options"
+@inject OptionsStorageService optionsStorage
+
+<MudExpansionPanels>
+    <MudExpansionPanel Text="ExHentai Settings">
+        <MudGrid>
+            <MudItem xs="10">
+                <MudText Typo="Typo.body1">Use ExHentai (Require Login)</MudText>
+            </MudItem>
+            <MudItem xs="2">
+                <MudSwitch @bind-Checked="@optionsStorage.UseEx" Color="Color.Primary" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="@optionsStorage.EhUsername" Label="E-Hentai Username" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="@optionsStorage.EhPassword" Label="E-Hentai Password" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+        </MudGrid>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+<MudDivider />
+<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="async () => await optionsStorage.SaveChangesAsync()">Save</MudButton>
+
