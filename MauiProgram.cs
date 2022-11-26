@@ -27,7 +27,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton((options) => 
 		{ 
 			var res = new OptionsStorageService();
-			res.UpdateFromStorageAsync();
+
 			return res;
 		});
 		builder.Services.AddScoped<EhSearchingService>();
@@ -39,6 +39,7 @@ public static class MauiProgram
 		var app = builder.Build();
 		//has to resolve once here for the sake of initialization...
 		var optionsInitial = app.Services.GetService<OptionsStorageService>();
+		optionsInitial.UpdateFromStorageAsync();
         return app;
 	}
 }

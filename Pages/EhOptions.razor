@@ -1,5 +1,6 @@
 ﻿@page "/options"
 @inject OptionsStorageService optionsStorage
+@inject ISnackbar snackBar
 
 <MudExpansionPanels>
     <MudExpansionPanel Text="ExHentai Settings">
@@ -10,12 +11,39 @@
             <MudItem xs="2">
                 <MudSwitch @bind-Checked="@optionsStorage.UseEx" Color="Color.Primary" />
             </MudItem>
-            <MudItem xs="12">
-                <MudTextField @bind-Value="@optionsStorage.EhUsername" Label="E-Hentai Username" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="12">
-                <MudTextField @bind-Value="@optionsStorage.EhPassword" Label="E-Hentai Password" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
+            @if (optionsStorage.UseEx)
+            {
+                <MudItem xs="12" lg="6">
+                    <MudTextField @bind-Value="@optionsStorage.EhUsername" Label="E-Hentai Username" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" lg="6">
+                    <MudTextField @bind-Value="@optionsStorage.EhPassword" Label="E-Hentai Password" Variant="Variant.Outlined"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" lg="6">
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Info" OnClick="AcquireToken">Acquire Token</MudButton>
+                </MudItem>
+                <MudItem xs="10" lg="5">
+                    <MudText Typo="Typo.body1">ExHentai Cookie Advanced Options</MudText>
+                </MudItem>
+                <MudItem xs="2" lg="1">
+                    <MudSwitch @bind-Checked="@optionsStorage.UseAdvancedOptions" Color="Color.Warning" />
+                </MudItem>
+                @if (optionsStorage.UseAdvancedOptions)
+                {
+                    <MudItem xs="12" lg="6">
+                        <MudAlert Severity="Severity.Warning">Modify these values ONLY IF you know what you're doing</MudAlert>
+                    </MudItem>
+                    <MudItem xs="12" lg="6">
+                        <MudTextField @bind-Value="@optionsStorage.EhSessionId" Label="E-Hentai Token- ipb_session_id" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" lg="6">
+                        <MudTextField @bind-Value="@optionsStorage.EhMemberId" Label="E-Hentai Token- ipb_member_id" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" lg="6">
+                        <MudTextField @bind-Value="@optionsStorage.EhPassHash" Label="E-Hentai Token- ipb_pass_hash" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                }
+            }
         </MudGrid>
     </MudExpansionPanel>
 </MudExpansionPanels>
