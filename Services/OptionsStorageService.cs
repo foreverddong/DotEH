@@ -8,7 +8,6 @@ namespace DotEH.Services
 {
     public class OptionsStorageService
     {
-        private bool initialized = false;
         public bool UseEx { get; set; }
         public string EhUsername { get; set; }
         public string EhPassword { get; set; }
@@ -34,7 +33,6 @@ namespace DotEH.Services
             };
             this.EhUsername = await SecureStorage.Default.GetAsync("EhUsername");
             this.EhPassword = await SecureStorage.Default.GetAsync("EhPassword");
-            this.initialized = true;
         }
 
         public async Task SaveChangesAsync()

@@ -1,2 +1,24 @@
 ﻿@page "/"
+@inject EhSearchingService searchingService
 
+<MudGrid>
+    <MudItem xs="12" sm="12" md="10" lg="10">
+        <MudTextField @bind-Value="queryStr" Label="Search" Variant="Variant.Outlined"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="12" md="2" lg="2">
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="PerformSearch">Search</MudButton>
+    </MudItem>
+</MudGrid>
+<MudDivider/>
+<MudGrid>
+    @foreach(var m in metadata)
+    {
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard>
+                <MudCardMedia Image="@m.thumb">
+
+                </MudCardMedia>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>

@@ -1,22 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using DotEH.Model;
+using HtmlAgilityPack;
 
 namespace DotEH.Services
 {
     public class EhSearchingService
     {
         private readonly OptionsStorageService optionsStorage;
-        public EhSearchingService(OptionsStorageService _optionsStorage)
+        private readonly HttpClient client;
+
+        private string nextId { get; set; }
+        public EhSearchingService(OptionsStorageService _optionsStorage, HttpClient _httpClient)
         {
             this.optionsStorage = _optionsStorage;
+            this.client = _httpClient;
         }
 
-        public async Task DoSearch(string query)
+        public async Task<IEnumerable<GalleryMetadata>> DoSearch(string query)
         {
-            
+            var queryParameters = new Dictionary<string, string>
+            {
+                {"F_search", query }
+            };
+            if (!string.IsNullOrEmpty(nextId))
+            {
+                queryParameters.Add("next", nextId);
+            }
+            var queryString = await new FormUrlEncodedContent(queryParameters).ReadAsStringAsync();
+            var response = await client.GetAsync($"/?{queryString}");
+            return await this.ParseGalleryEntries(await response.Content.ReadAsStringAsync());
         }
+
+        private async Task<IEnumerable<GalleryMetadata>> ParseGalleryEntries(string htmlString)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(htmlString);
+            var entryRows = doc.DocumentNode.SelectNodes(@"//table[@class='itg gltc'][1]/tr").Skip(1);
+            var metadataRequestArray = entryRows.Where(r => r.ChildNodes.Count >= 3).Select(r => 
+            {
+                var entry = new GalleryEntry(r.ChildNodes[2].ChildNodes[0].ChildNodes[0].InnerText, r.ChildNodes[2].ChildNodes[0].Attributes["href"].Value);
+                return entry;
+            }).Select(r => 
+            {
+                return $"[{r.GalleryId}, \"{r.GalleryToken}\"]";
+            }).Aggregate((a, b) => $"{a}, {b}");
+            var metadataBody = $"{{ \"method\": \"gdata\", \"gidlist\" : [{metadataRequestArray}] }}";
+            var rawMetadataResponse = await (await client.PostAsync(@"/api.php", new StringContent(metadataBody))).Content.ReadAsStringAsync();
+            var jsondoc = JsonDocument.Parse(rawMetadataResponse);
+            var metaNodes = jsondoc.RootElement.GetProperty("gmetadata").EnumerateArray();
+            var result = metaNodes.Select(n => 
+            {
+                return JsonSerializer.Deserialize<GalleryMetadata>(n.GetRawText());
+            });
+            return result;
+        }
+
+
     }
 }

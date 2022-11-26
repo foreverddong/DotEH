@@ -24,10 +24,10 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 		builder.Services.AddMudServices();
-		builder.Services.AddSingleton<OptionsStorageService>((options) => 
+		builder.Services.AddSingleton((options) => 
 		{ 
 			var res = new OptionsStorageService();
-			res.UpdateFromStorage();
+			res.UpdateFromStorageAsync();
 			return res;
 		});
 		builder.Services.AddScoped<EhSearchingService>();
@@ -36,6 +36,9 @@ public static class MauiProgram
 			var settings = services.GetService<OptionsStorageService>();
             client.BaseAddress = settings.EhBaseAddress;
         });
-        return builder.Build();
+		var app = builder.Build();
+		//has to resolve once here for the sake of initialization...
+		var optionsInitial = app.Services.GetService<OptionsStorageService>();
+        return app;
 	}
 }
