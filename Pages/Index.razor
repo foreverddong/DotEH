@@ -35,6 +35,16 @@
         </MudItem>
     }
     <MudItem xs="12" sm="6" md="4" lg="3">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="PerformSearch">Load More</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="PerformSearch">
+            @if (searching)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Loading</MudText>
+            }
+            else
+            {
+                <MudText Class="ms-2">Load More</MudText>
+            }
+        </MudButton>
     </MudItem>
 </MudGrid>

@@ -36,19 +36,21 @@ namespace DotEH.Services
             var queryString = await new FormUrlEncodedContent(queryParameters).ReadAsStringAsync();
             var response = await client.GetAsync($"/?{queryString}");
             var rawMetadataResult = await this.ParseGalleryEntries(await response.Content.ReadAsStringAsync());
+            using var imgClient = new HttpClient();
+            Console.WriteLine("Started Downloading Thumbnail...");
+            if (optionsStorage.UseEx)
+            {
+                imgClient.DefaultRequestHeaders.Add("Cookie", optionsStorage.Cookies);
+            }
             var result = rawMetadataResult.Select(async (m) => 
             { 
-                using var imgClient = new HttpClient();
-                if (optionsStorage.UseEx)
-                {
-                    imgClient.DefaultRequestHeaders.Add("Cookie", optionsStorage.Cookies);
-                }
                 return new ImageGalleryMetadata
                 {
                     Metadata = m,
                     base64Image = await imgClient.GetByteArrayAsync(m.thumb),
                 };
             });
+            Console.WriteLine("Finished..");
             return (await Task.WhenAll(result)).ToList();
         }
 
