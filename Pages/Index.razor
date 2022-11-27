@@ -1,5 +1,7 @@
 ﻿@page "/"
 @inject EhSearchingService searchingService
+@inject OptionsStorageService optionsStorage
+@inject IJSRuntime jsRuntime
 
 <MudGrid>
     <MudItem xs="12" sm="12" md="10" lg="10">
@@ -25,9 +27,9 @@
     {
         <MudItem xs="12" sm="6" md="4" lg="3">
             <MudCard>
-                <MudCardMedia Image="@m.thumb" Height="200" />
+                <MudCardMedia Image="@m.base64String" Height="200" />
                 <MudCardContent>
-                    <MudText Typo="Typo.h6">@m.title</MudText>
+                    <MudText Typo="Typo.h6">@m.Metadata.title</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>

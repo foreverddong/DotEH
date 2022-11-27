@@ -42,6 +42,15 @@
                     <MudItem xs="12" lg="6">
                         <MudTextField @bind-Value="@optionsStorage.EhPassHash" Label="E-Hentai Token- ipb_pass_hash" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
+                    <MudItem xs="12" lg="6">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="async () => await optionsStorage.RefreshIgneousAsync()">
+                            Refresh Igneous
+                        </MudButton>
+                    </MudItem>
+                    <MudItem xs="12" lg="6">
+                        <MudTextField @bind-Value="@optionsStorage.EhIgneous" Label="E-Hentai Token- igneous" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+
                 }
             }
         </MudGrid>

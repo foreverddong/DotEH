@@ -27,7 +27,6 @@ public static class MauiProgram
 		builder.Services.AddSingleton((options) => 
 		{ 
 			var res = new OptionsStorageService();
-
 			return res;
 		});
 		builder.Services.AddScoped<EhSearchingService>();
@@ -35,6 +34,10 @@ public static class MauiProgram
         {
 			var settings = services.GetService<OptionsStorageService>();
             client.BaseAddress = settings.EhBaseAddress;
+			if (settings.UseEx)
+			{
+				client.DefaultRequestHeaders.Add("Cookie", settings.Cookies);
+			}
         });
 		var app = builder.Build();
 		//has to resolve once here for the sake of initialization...

@@ -56,4 +56,8 @@
         <PackageReference Include="MudBlazor" Version="6.1.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\cache\" />
+    </ItemGroup>
+
 </Project>

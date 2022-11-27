@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -17,6 +18,20 @@ namespace DotEH.Services
         public string EhSessionId { get; set; }
         public string EhMemberId { get; set; }
         public string EhPassHash { get; set; }
+
+        public string EhIgneous { get; set; }
+        public List<string> Cookies 
+        {
+            get
+            {
+                return new()
+                {
+                    $"ipb_member_id={this.EhMemberId};",
+                    $"ipb_pass_hash={this.EhPassHash};",
+                    $"igneous={this.EhIgneous};"
+                };
+            }
+        }
 
         public Uri EhBaseAddress
         {
@@ -49,6 +64,7 @@ namespace DotEH.Services
             this.EhSessionId = await SecureStorage.Default.GetAsync("EhSessionId");
             this.EhMemberId = await SecureStorage.Default.GetAsync("EhMemberId");
             this.EhPassHash = await SecureStorage.Default.GetAsync("EhPassHash");
+            this.EhIgneous = await SecureStorage.Default.GetAsync("EhIgneous");
         }
 
         public async Task SaveChangesAsync()
@@ -61,6 +77,7 @@ namespace DotEH.Services
             await SecureStorage.Default.SetAsync("EhSessionId", this.EhSessionId);
             await SecureStorage.Default.SetAsync("EhMemberId", this.EhMemberId);
             await SecureStorage.Default.SetAsync("EhPassHash", this.EhPassHash);
+            await SecureStorage.Default.SetAsync("EhIgneous", this.EhIgneous);
         }
 
         public async Task AcquireEhTokenAsync()
@@ -87,6 +104,26 @@ namespace DotEH.Services
                 .Value;
             this.EhPassHash = (new Regex("ipb_pass_hash=([a-z0-9]+);"))
                 .Match(cookies.Where(h => h.StartsWith("ipb_pass_hash")).First())
+                .Groups[1]
+                .Value;
+            this.RefreshIgneousAsync();
+
+        }
+        public async Task RefreshIgneousAsync()
+        {
+            using var exClient = new HttpClient();
+            exClient.BaseAddress = new Uri(@"https://exhentai.org");
+            exClient.DefaultRequestHeaders.Add("Cookie", new List<string>()
+                {
+                    $"ipb_member_id={this.EhMemberId};",
+                    $"ipb_pass_hash={this.EhPassHash};",
+                });
+            var igResult = await exClient.GetAsync("/");
+            var response = await igResult.Content.ReadAsStringAsync();
+            var exCookies = igResult.Headers.NonValidated
+                .Where(h => h.Key == "Set-Cookie").First().Value;
+            this.EhIgneous = (new Regex("igneous=([a-z0-9]+);"))
+                .Match(exCookies.Where(h => h.StartsWith("igneous")).First())
                 .Groups[1]
                 .Value;
         }

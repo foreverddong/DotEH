@@ -29,6 +29,11 @@ namespace DotEH.Model
         public string parent_key { get; set; }
         public string first_gid { get; set; }
         public string first_key { get; set; }
+
+        public string GetUniqueFileName()
+        {
+            return $"{gid}_{token}_thumb.jpg";
+        }
     }
 
     public class Torrent
