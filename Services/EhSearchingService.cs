@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
@@ -8,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DotEH.Model;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 
 namespace DotEH.Services
 {
@@ -15,15 +17,17 @@ namespace DotEH.Services
     {
         private readonly OptionsStorageService optionsStorage;
         private readonly HttpClient client;
+        private readonly ILogger<EhSearchingService> logger;
 
         private string nextId { get; set; }
-        public EhSearchingService(OptionsStorageService _optionsStorage, HttpClient _httpClient)
+        public EhSearchingService(OptionsStorageService _optionsStorage, HttpClient _httpClient, ILogger<EhSearchingService> _logger)
         {
             this.optionsStorage = _optionsStorage;
             this.client = _httpClient;
+            this.logger = _logger;
         }
 
-        public async Task<IEnumerable<ImageGalleryMetadata>> DoSearch(string query)
+        public async Task<IEnumerable<GalleryMetadata>> DoSearch(string query)
         {
             var queryParameters = new Dictionary<string, string>
             {
@@ -34,24 +38,11 @@ namespace DotEH.Services
                 queryParameters.Add("next", nextId);
             }
             var queryString = await new FormUrlEncodedContent(queryParameters).ReadAsStringAsync();
-            var response = await client.GetAsync($"/?{queryString}");
+            var message = PrepareMessage($"{optionsStorage.EhBaseAddress}?{queryString}", HttpMethod.Get);
+            var response = await client.SendAsync(message);
             var rawMetadataResult = await this.ParseGalleryEntries(await response.Content.ReadAsStringAsync());
-            using var imgClient = new HttpClient();
-            Console.WriteLine("Started Downloading Thumbnail...");
-            if (optionsStorage.UseEx)
-            {
-                imgClient.DefaultRequestHeaders.Add("Cookie", optionsStorage.Cookies);
-            }
-            var result = rawMetadataResult.Select(async (m) => 
-            { 
-                return new ImageGalleryMetadata
-                {
-                    Metadata = m,
-                    base64Image = await imgClient.GetByteArrayAsync(m.thumb),
-                };
-            });
-            Console.WriteLine("Finished..");
-            return (await Task.WhenAll(result)).ToList();
+
+            return rawMetadataResult;
         }
 
         private async Task<IEnumerable<GalleryMetadata>> ParseGalleryEntries(string htmlString)
@@ -68,7 +59,9 @@ namespace DotEH.Services
                 return $"[{r.GalleryId}, \"{r.GalleryToken}\"]";
             }).Aggregate((a, b) => $"{a}, {b}");
             var metadataBody = $"{{ \"method\": \"gdata\", \"gidlist\" : [{metadataRequestArray}] }}";
-            var rawMetadataResponse = await (await client.PostAsync(@"/api.php", new StringContent(metadataBody))).Content.ReadAsStringAsync();
+            var message = PrepareMessage($"{optionsStorage.EhBaseAddress}api.php", HttpMethod.Post);
+            message.Content = new StringContent(metadataBody);
+            var rawMetadataResponse = await (await client.SendAsync(message)).Content.ReadAsStringAsync();
             var jsondoc = JsonDocument.Parse(rawMetadataResponse);
             var metaNodes = jsondoc.RootElement.GetProperty("gmetadata").EnumerateArray();
             var result = metaNodes.Select(n =>
@@ -82,6 +75,23 @@ namespace DotEH.Services
             return result;
         }
 
-
+        private HttpRequestMessage PrepareMessage(string uri, HttpMethod method)
+        {
+            var message = new HttpRequestMessage
+            {
+                RequestUri = new Uri(uri),
+                Method = method,
+            };
+            if (optionsStorage.UseEx)
+            {
+                /*
+                   $"ipb_member_id={this.EhMemberId};",
+                    $"ipb_pass_hash={this.EhPassHash};",
+                    $"igneous={this.EhIgneous};"
+                 */
+                message.Headers.Add("Cookie", optionsStorage.Cookies);
+            }
+            return message;
+        }
     }
 }

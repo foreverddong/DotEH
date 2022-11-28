@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components.WebView.Maui;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,15 +21,14 @@ namespace DotEH.Services
         public string EhPassHash { get; set; }
 
         public string EhIgneous { get; set; }
+
         public List<string> Cookies 
         {
             get
             {
                 return new()
                 {
-                    $"ipb_member_id={this.EhMemberId};",
-                    $"ipb_pass_hash={this.EhPassHash};",
-                    $"igneous={this.EhIgneous};"
+                    $"ipb_member_id={this.EhMemberId}; ipb_pass_hash={this.EhPassHash}; igneous={this.EhIgneous};",
                 };
             }
         }

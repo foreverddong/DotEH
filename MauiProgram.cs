@@ -22,27 +22,33 @@ public static class MauiProgram
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
 		builder.Logging.AddDebug();
+		builder.Services.AddLogging(logging => 
+		{
+			logging.AddDebug();
+		});
 #endif
 		builder.Services.AddMudServices();
-		builder.Services.AddSingleton((options) => 
-		{ 
+		builder.Services.AddSingleton((sp) => {
 			var res = new OptionsStorageService();
+            Task.Run(() => {
+                res.UpdateFromStorageAsync().Wait();
+            }).Wait();
 			return res;
-		});
+        });
 		builder.Services.AddScoped<EhSearchingService>();
-        builder.Services.AddHttpClient<EhSearchingService>((services, client) =>
+        builder.Services.AddScoped<HttpClient>((services) =>
         {
-			var settings = services.GetService<OptionsStorageService>();
-            client.BaseAddress = settings.EhBaseAddress;
+            var client = new HttpClient();
+            var settings = services.GetService<OptionsStorageService>();
 			if (settings.UseEx)
 			{
 				client.DefaultRequestHeaders.Add("Cookie", settings.Cookies);
 			}
+			return client;
         });
 		var app = builder.Build();
-		//has to resolve once here for the sake of initialization...
-		var optionsInitial = app.Services.GetService<OptionsStorageService>();
-		optionsInitial.UpdateFromStorageAsync();
+
+		
         return app;
 	}
 }

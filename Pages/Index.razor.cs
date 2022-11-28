@@ -10,7 +10,7 @@ namespace DotEH.Pages
     public partial class Index
     {
         private string queryStr { get; set; }
-        private List<ImageGalleryMetadata> metadata { get; set; } = new List<ImageGalleryMetadata>();
+        private List<GalleryMetadata> metadata { get; set; } = new List<GalleryMetadata>();
         private bool searching = false;
 
         public async Task PerformSearch()
@@ -18,11 +18,6 @@ namespace DotEH.Pages
             this.searching = true;
             this.metadata.AddRange(await searchingService.DoSearch(queryStr));
             this.searching = false;
-        }
-
-        protected override async Task OnInitializedAsync()
-        {
-            await optionsStorage.UpdateFromStorageAsync();
         }
     }
 }
