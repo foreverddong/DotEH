@@ -2,22 +2,11 @@
 @inject EhSearchingService searchingService
 @inject OptionsStorageService optionsStorage
 @inject IJSRuntime jsRuntime
+@inject IDialogService dialogService
+
 <MudGrid>
-    <MudItem xs="12" sm="12" md="10" lg="10">
-        <MudTextField @bind-Value="queryStr" Label="Search" Variant="Variant.Outlined"></MudTextField>
-    </MudItem>
-    <MudItem xs="12" sm="12" md="2" lg="2">
-        <MudButton Disabled=@searching Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="PerformSearch">
-            @if (searching)
-            {
-                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                <MudText Class="ms-2">Searching</MudText>
-            }
-            else
-            {
-                <MudText>Search</MudText>
-            }
-        </MudButton>
+    <MudItem xs="2" sm="2" md="2" lg="2">
+        <MudIconButton Icon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="OpenSearchDialog"></MudIconButton>
     </MudItem>
 </MudGrid>
 <MudDivider />

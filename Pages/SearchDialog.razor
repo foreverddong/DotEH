@@ -1,7 +1,29 @@
 ﻿<MudDialog>
-    <MudGrid>
-        <MudItem xs="12">
-
-        </MudItem>
-    </MudGrid>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="queryStr" Label="Custom Search Keywords" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudExpansionPanels MultiExpansion="true">
+                    <MudExpansionPanel Text="Category">
+                        <MudGrid Spacing="0" Justify="Justify.SpaceBetween">
+                            @foreach (var s in buttonStates)
+                            {
+                                <MudItem xs="3">
+                                    <MudButton
+                                        Variant="Variant.Filled" Size="Size.Small" 
+                                        Style="@(s.Style)"
+                                        OnClick="() => {s.Enabled = !s.Enabled;}">@s.Name</MudButton>
+                                </MudItem>
+                            }
+                        </MudGrid>
+                    </MudExpansionPanel>
+                    <MudExpansionPanel Text="Tags">
+                        <MudText Typo="Typo.h4">Category</MudText>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
 </MudDialog>

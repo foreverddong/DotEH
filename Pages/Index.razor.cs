@@ -1,4 +1,5 @@
 ﻿using DotEH.Model;
+using MudBlazor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,11 @@ namespace DotEH.Pages
             this.searching = true;
             this.metadata.AddRange(await searchingService.DoSearch(queryStr));
             this.searching = false;
+        }
+
+        private void OpenSearchDialog()
+        {
+            dialogService.Show<SearchDialog>("Searching", new DialogOptions { CloseOnEscapeKey = true });
         }
     }
 }
