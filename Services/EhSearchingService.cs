@@ -80,10 +80,15 @@ namespace DotEH.Services
             {
                 return JsonSerializer.Deserialize<GalleryMetadata>(n.GetRawText());
             });
-            var nextHref = doc.DocumentNode.SelectSingleNode("//a[@id='dnext']").Attributes["href"].Value;
-            var regex = new Regex(@"(.*)next[=]([0-9]+)");
-            var groups = regex.Match(nextHref).Groups;
-            this.nextId = groups[2].Value;
+            try
+            {
+                var nextHref = doc.DocumentNode.SelectSingleNode("//a[@id='dnext']").Attributes["href"].Value;
+                var regex = new Regex(@"(.*)next[=]([0-9]+)");
+                var groups = regex.Match(nextHref).Groups;
+                this.nextId = groups[2].Value;
+            }
+            catch (NullReferenceException) { }
+
             return result;
         }
 

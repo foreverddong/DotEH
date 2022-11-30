@@ -115,8 +115,7 @@ namespace DotEH.Services
             exClient.BaseAddress = new Uri(@"https://exhentai.org");
             exClient.DefaultRequestHeaders.Add("Cookie", new List<string>()
                 {
-                    $"ipb_member_id={this.EhMemberId};",
-                    $"ipb_pass_hash={this.EhPassHash};",
+                    $"ipb_member_id={this.EhMemberId}; ipb_pass_hash={this.EhPassHash};",
                 });
             var igResult = await exClient.GetAsync("/");
             var response = await igResult.Content.ReadAsStringAsync();
