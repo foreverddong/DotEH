@@ -6,7 +6,7 @@
 
 <MudGrid>
     <MudItem xs="2" sm="2" md="2" lg="2">
-        <MudIconButton Icon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="OpenSearchDialog"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="OpenSearchDialog" Disabled="searching"></MudIconButton>
     </MudItem>
 </MudGrid>
 <MudDivider />
@@ -23,7 +23,7 @@
         </MudItem>
     }
     <MudItem xs="6" sm="6" md="4" lg="3">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="PerformSearch">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="PerformSearch" Disabled="searching">
             @if (searching)
             {
                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />

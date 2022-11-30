@@ -1,4 +1,6 @@
-﻿<MudDialog>
+﻿@inject TagStorageService tagStorage
+
+<MudDialog>
     <DialogContent>
         <MudGrid>
             <MudItem xs="12">
@@ -11,18 +13,37 @@
                             @foreach (var s in buttonStates)
                             {
                                 <MudItem xs="3">
-                                    <MudButton
-                                        Variant="Variant.Filled" Size="Size.Small" 
-                                        Style="@(s.Style)"
-                                        OnClick="() => {s.Enabled = !s.Enabled;}">@s.Name</MudButton>
+                                    <MudButton Variant="Variant.Filled" Size="Size.Small"
+                                           Style="@(s.Style)"
+                                           OnClick="() => {s.Enabled = !s.Enabled;}">@s.Name</MudButton>
                                 </MudItem>
                             }
                         </MudGrid>
                     </MudExpansionPanel>
-                    <MudExpansionPanel Text="Tags">
-                        <MudText Typo="Typo.h4">Category</MudText>
+                    <MudExpansionPanel Text="Tags (namespace:tag)">
+                        <MudGrid Spacing="0" Justify="Justify.FlexStart">
+                            <MudItem xs="10">
+                                <MudAutocomplete T="string" Label="Tag" @bind-Value="tagString" SearchFunc="@TagSearch"
+                                                 ResetValueOnEmptyText="false"
+                                                 CoerceText="false"
+                                                 CoerceValue="true" />
+                            </MudItem>
+                            <MudItem xs="2">
+                                <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddTag" />
+                            </MudItem>
+                            @foreach (var t in addedTags)
+                            {
+                                <MudChip Variant="Variant.Text" Color="Color.Primary">@t</MudChip>
+                            }
+                        </MudGrid>
                     </MudExpansionPanel>
                 </MudExpansionPanels>
+            </MudItem>
+            <MudItem xs="6">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="ConfirmSearch">Search</MudButton>
+            </MudItem>
+            <MudItem xs="6">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="CloseDialog">Cancel</MudButton>
             </MudItem>
         </MudGrid>
     </DialogContent>

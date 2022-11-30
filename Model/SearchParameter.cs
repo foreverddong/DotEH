@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotEH.Pages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -46,13 +47,13 @@ namespace DotEH.Model
             {
                 return !this.categoryCode.IsBitSet(1);
             }
-            set 
+            set
             {
                 if (value)
                 {
                     categoryCode &= ~(1u << 1); ;
                 }
-                else 
+                else
                 {
                     categoryCode |= 1 << 1;
                 }
@@ -204,7 +205,25 @@ namespace DotEH.Model
         }
         public uint categoryCode { get; set; } = 0;
 
-        public List<(string Namespace, string Tag)> Tags { get; set; } = new();
+        public List<string> Tags { get; set; } = new();
+
+        public string Query = "";
+
+        public SearchParameter(List<CategoryButtonState> categories, List<string> tags, string query)
+        {
+            this.Tags.AddRange(tags);
+            this.Doujinshi = categories.IsCategorySet("Doujinshi");
+            this.Manga = categories.IsCategorySet("Manga");
+            this.ArtistCG = categories.IsCategorySet("Artist CG");
+            this.GameCG = categories.IsCategorySet("Game CG");
+            this.Western = categories.IsCategorySet("Western");
+            this.NonH = categories.IsCategorySet("Non-H");
+            this.ImageSet = categories.IsCategorySet("Image Set");
+            this.Cosplay = categories.IsCategorySet("Cosplay");
+            this.AsianPorn = categories.IsCategorySet("Asian Porn");
+            this.Misc = categories.IsCategorySet("Misc");
+            this.Query = query;
+        }
 
     }
 
@@ -213,6 +232,14 @@ namespace DotEH.Model
         public static bool IsBitSet(this uint num, int index)
         {
             return (num & (1 << index)) != 0;
+        }
+    }
+
+    public static class CategoryListExtensions
+    {
+        public static bool IsCategorySet(this List<CategoryButtonState> states, string name)
+        {
+            return states.First(s => s.Name == name).Enabled;
         }
     }
 }

@@ -13,17 +13,28 @@ namespace DotEH.Pages
         private string queryStr { get; set; }
         private List<GalleryMetadata> metadata { get; set; } = new List<GalleryMetadata>();
         private bool searching = false;
+        private SearchParameter search;
 
         public async Task PerformSearch()
         {
             this.searching = true;
-            this.metadata.AddRange(await searchingService.DoSearch(queryStr));
+            StateHasChanged();
+            this.metadata.AddRange(await searchingService.DoSearch(search));
             this.searching = false;
+            StateHasChanged();
         }
 
-        private void OpenSearchDialog()
+        private async void OpenSearchDialog()
         {
-            dialogService.Show<SearchDialog>("Searching", new DialogOptions { CloseOnEscapeKey = true });
+            var dialog = dialogService.Show<SearchDialog>("Searching", new DialogOptions { CloseOnEscapeKey = false, DisableBackdropClick = true }) ;
+            var result = await dialog.GetReturnValueAsync<SearchParameter>();
+            if (result == null)
+            {
+                return;
+            }
+            this.searchingService.ClearSearch();
+            this.search = result;
+            await this.PerformSearch();
         }
     }
 }

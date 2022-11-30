@@ -1,4 +1,5 @@
 ﻿using DotEH.Model;
+using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,24 +11,43 @@ namespace DotEH.Services
 {
     public class TagStorageService
     {
-        public GallaryTags tags { get; set; }
-        private readonly string jsonDir = $"{FileSystem.Current.AppDataDirectory}/tags.json";
+        private string jsonstr = $"{FileSystem.AppDataDirectory}/tags.json";
 
-        public async Task LoadLocalTags()
+        public GalleryTag Storage { get; set; } = new();
+
+        public async Task LoadTagsAsync()
         {
-            if (!File.Exists(jsonDir))
+            if (!File.Exists(jsonstr))
             {
                 return;
             }
-            using var jsonfile = File.OpenRead(jsonDir);
-            this.tags = await JsonSerializer.DeserializeAsync<GallaryTags>(jsonfile);
-
+            using (var file = File.OpenRead(jsonstr))
+            {
+                try
+                {
+                    this.Storage = await JsonSerializer.DeserializeAsync<GalleryTag>(file);
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+            }
         }
 
-        public async Task SaveLocalTags()
+        public async Task AddTagOrSkip(string newTag)
         {
-            using var jsonfile = File.Open(jsonDir, FileMode.OpenOrCreate);
-            await JsonSerializer.SerializeAsync(jsonfile , this.tags);
+            if (this.Storage.Tags.Any(t => t == newTag))
+            {
+                return;
+            }
+            this.Storage.Tags.Add(newTag);
+            await this.SaveTagsAsync();
+        }
+
+        public async Task SaveTagsAsync()
+        {
+            using var file = File.Open(jsonstr, FileMode.OpenOrCreate);
+            await JsonSerializer.SerializeAsync(file, this.Storage);
         }
     }
 }

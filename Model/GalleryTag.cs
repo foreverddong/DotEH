@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DotEH.Model
 {
-    public class GallaryTags
+    public class GalleryTag
     {
-        public Dictionary<string, List<string>> AllTags { get; set; } = new();
+        public List<string> Tags { get; set; } = new();
     }
 }

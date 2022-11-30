@@ -27,11 +27,23 @@ namespace DotEH.Services
             this.logger = _logger;
         }
 
-        public async Task<IEnumerable<GalleryMetadata>> DoSearch(string query)
+        public async Task<IEnumerable<GalleryMetadata>> DoSearch(SearchParameter param)
+        {
+            var querystr = param.Query + " " + param.Tags.Aggregate((a, b) => $"{a}$ {b}$");
+            return await DoSearch(querystr, param.categoryCode);
+        }
+
+        public void ClearSearch()
+        {
+            this.nextId = "";
+        }
+
+        public async Task<IEnumerable<GalleryMetadata>> DoSearch(string query, uint category)
         {
             var queryParameters = new Dictionary<string, string>
             {
-                {"F_search", query }
+                {"f_cats",  category.ToString()},
+                {"f_search", query },
             };
             if (!string.IsNullOrEmpty(nextId))
             {

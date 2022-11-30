@@ -2,6 +2,7 @@
 using MudBlazor.Services;
 using DotEH.Services;
 using Microsoft.Extensions.DependencyInjection;
+using DotEH.Model;
 
 namespace DotEH;
 
@@ -46,6 +47,7 @@ public static class MauiProgram
 			}
 			return client;
         });
+		builder.Services.AddSingleton<TagStorageService>();
 		var app = builder.Build();
 
 		
